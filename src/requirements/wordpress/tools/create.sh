@@ -1,24 +1,28 @@
 #!/bin/sh
 
-if [ -f ./wp-config.php ]
-then
-	echo "wordpress already downloaded"
-else
-	wget http://wordpress.org/latest.tar.gz
-	tar xfz latest.tar.gz
-	mv wordpress/* .
-	rm -rf latest.tar.gz
-	rm -rf wordpress
+# if [ -f ./wp-config.php ]
+# then
+# 	echo "wordpress already downloaded"
+# else
+	# wget http://wordpress.org/latest.tar.gz
+	# tar xfz latest.tar.g
+	# mv wordpress/* .
+	# rm -rf latest.tar.gz
+	# rm -rf wordpress
 
-	sed -i "s/username_here/$MYSQL_USER/g" wp-config-sample.php
-	sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config-sample.php
-	sed -i "s/localhost/$MYSQL_HOSTNAME/g" wp-config-sample.php
-	sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
-	cp wp-config-sample.php wp-config.php
-
-	wp core install --url="https://heloufra.42.fr" --title="heloufra" --admin_user="heloufra" --admin_password="@MYSQL_PASSWORD" --admin_email="heloufra@42.fr"
-	wp user create heloufra heloufra@42.fr --user_pass=$MYSQL_PASSWORD --display_name=heloufra --role=administrator --allow-root
-fi
+	# sed -i "s/username_here/$MYSQL_USER/g" wp-config-sample.php
+	# sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config-sample.php
+	# sed -i "s/localhost/$MYSQL_HOSTNAME/g" wp-config-sample.php
+	# sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
+	# cp wp-config-sample.php wp-config.php
+	sleep 10
+	# rm -fr  wp-config.php
+	wp core config --allow-root --dbhost=$MYSQL_HOSTNAME --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD
+	chown -R www-data *
+	chmod +x wp-config.php
+	wp core install --allow-root --url="https://heloufra.42.fr" --title="heloufra" --admin_user="heloufra" --admin_password="@MYSQL_PASSWORD" --admin_email="heloufra@42.fr"
+	wp user create --allow-root "heloufra" heloufra@42.fr --user_pass=$MYSQL_PASSWORD --display_name=heloufra --role=administrator --allow-root
+# fi
 
 exec "$@"
 
