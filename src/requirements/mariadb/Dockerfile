@@ -1,13 +1,18 @@
-FROM debian:10.11
+FROM debian:buster
 
-RUN apt-get update && apt-get install -y mariadb-server
+RUN apt-get update && apt-get install -y mariadb-server mariadb-client vim
 
-RUN sed -i 's/^bind-address\s=./bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+RUN mkdir -p /var/run/mysqld \
+&& chown -R mysql:mysql /var/run/mysqld \
+&& chmod 777 /var/run/mysqld
 
+EXPOSE 3306
 
-COPY ./tools/script.sh /
-RUN chmod 777 /script.sh
+COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
+COPY ./script.sh /script.sh
+RUN chmod +x /script.sh
 
-RUN service mysql start && /script.sh
+ENTRYPOINT [ "script.sh" ]
 
 CMD ["mysqld"]
+

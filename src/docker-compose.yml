@@ -23,7 +23,9 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - network
-    restart: always
+    ports:
+      - 3306:3306
+    # restart: always
     env_file:
       - .env
 
