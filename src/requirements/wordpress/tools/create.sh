@@ -1,39 +1,12 @@
 #!/bin/bash
 
 sleep 10
-mkdir /var/www/
-mkdir /var/www/html
+wp core config --allow-root --dbhost="${MYSQL_HOSTNAME}" --dbname="${MYSQL_DATABASE}" --dbuser="${MYSQL_USER}" --dbpass="${MYSQL_PASSWORD}"
+chmod 600 wp-config.php
+chown -R www-data *
 
-cd /var/www/html
-rm -rf *
-
-curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar 
-
-chmod +x wp-cli.phar 
-
-mv wp-cli.phar /usr/local/bin/wp
-
-
-wp core download --allow-root
-
-mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-
-mv /wp-config.php /var/www/html/wp-config.php
-
-sed -i -r "s/db1/$MYSQL_DATABASE/1"   wp-config.php
-sed -i -r "s/user/$MYSQL_USER/1"  wp-config.php
-sed -i -r "s/pwd/$MYSQL_PASSWORD/1"    wp-config.php
-
-wp core install --url=$URL_DNS/ --title=$WP_TITLE --admin_user=$WP_TITLE --admin_password=$WP_ADMIN_PSW --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
-
-wp user create $WP_USR $WP_EMAIL --role=author --user_pass=$WP_PWD --allow-root
-
-wp theme install astra --activate --allow-root
-
-wp plugin update --all --allow-root
- 
+wp core install --allow-root --url="${URL_DNS}" --title="${WP_TITLE}" --admin_name="${WP_TITLE}" --admin_password="${WP_ADMIN_PSW}" --admin_email="${WP_ADMIN_EMAIL}"
+wp user create --allow-root ${WP_USR} ${WP_EMAIL} --user_pass=${WP_PWD} --role=${WP_USER_ROLE}
 sed -i 's/listen = \/run\/php\/php7.3-fpm.sock/listen = 9000/g' /etc/php/7.3/fpm/pool.d/www.conf
 
-mkdir /run/php
-
-/usr/sbin/php-fpm7.3 -F
+exec php-fpm7.3 -F -R

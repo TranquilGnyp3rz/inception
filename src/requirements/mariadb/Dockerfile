@@ -9,10 +9,9 @@ RUN mkdir -p /var/run/mysqld \
 EXPOSE 3306
 
 COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
-COPY ./script.sh /script.sh
+COPY ./tools//script.sh /script.sh
 RUN chmod +x /script.sh
 
-ENTRYPOINT [ "script.sh" ]
+ENTRYPOINT [ "/script.sh" ]
 
-CMD ["mysqld"]
-
+CMD ["mysqld_safe", "--user=mysql", "--console"]
