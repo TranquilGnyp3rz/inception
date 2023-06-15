@@ -1,51 +1,52 @@
-#!/bin/sh
-
-# if [ -f ./wp-config.php ]
-# then
-# 	echo "wordpress already downloaded"
-# else
-	# wget http://wordpress.org/latest.tar.gz
-	# tar xfz latest.tar.g
-	# mv wordpress/* .
-	# rm -rf latest.tar.gz
-	# rm -rf wordpress
-
-	# sed -i "s/username_here/$MYSQL_USER/g" wp-config-sample.php
-	# sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config-sample.php
-	# sed -i "s/localhost/$MYSQL_HOSTNAME/g" wp-config-sample.php
-	# sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
-	# cp wp-config-sample.php wp-config.php
-	sleep 10
-	# rm -fr  wp-config.php
-	wp core config --allow-root --dbhost=$MYSQL_HOSTNAME --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD
-	chown -R www-data *
-	chmod +x wp-config.php
-	wp core install --allow-root --url="https://heloufra.42.fr" --title="heloufra" --admin_user="heloufra" --admin_password="@MYSQL_PASSWORD" --admin_email="heloufra@42.fr"
-	wp user create --allow-root "heloufra" heloufra@42.fr --user_pass=$MYSQL_PASSWORD --display_name=heloufra --role=administrator --allow-root
-# fi
-
-exec "$@"
-
-
-
 #!/bin/bash
 
-# chown -R www-data /wordpress
-# cd wordpress
+sleep 10
+mkdir /var/www/
+mkdir /var/www/html
 
-# rm -rf wp-config.php
+cd /var/www/html
+rm -rf *
 
-# wp core config --allow-root --dbhost=${MYSQL_HOST} --dbname=${MYSQL_DB} --dbuser=${MYSQL_USER} --dbpass=${MYSQL_PASSWORD}
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar 
 
-# wp config set --allow-root 'FS_METHOD' ${WP_FS_METHOD};
-# wp config set --allow-root 'WP_REDIS_HOST' ${WP_REDIS_HOST};
-# wp config set --allow-root 'WP_REDIS_PORT' ${WP_REDIS_PORT};
-# cd wordpress
-# chmod +x wp-config.php
+chmod +x wp-cli.phar 
 
-# wp core install --allow-root --url=${URL_DNS} --title=${WP_TITLE} --admin_user=${WP_ADMIN} --admin_password=${WP_ADMIN_PSW} --admin_email=${WP_ADMIN_EMAIL}
-# wp user --allow-root create ${WP_USER} ${WP_EMAIL} --role=author --user_pass=${WP_USER}
-# wp plugin install --allow-root redis-cache --activate
-# wp redis enable --allow-root
+mv wp-cli.phar /usr/local/bin/wp
 
-# exec php-fpm7.3 -F -R
+
+wp core download --allow-root
+
+mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+
+mv /wp-config.php /var/www/html/wp-config.php
+
+sed -i -r "s/db1/$MYSQL_DATABASE/1"   wp-config.php
+sed -i -r "s/user/$MYSQL_USER/1"  wp-config.php
+sed -i -r "s/pwd/$MYSQL_PASSWORD/1"    wp-config.php
+
+wp core install --url=$URL_DNS/ --title=$WP_TITLE --admin_user=$WP_TITLE --admin_password=$WP_ADMIN_PSW --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
+
+
+
+
+wp user create $WP_USR $WP_EMAIL --role=author --user_pass=$WP_PWD --allow-root
+
+
+wp theme install astra --activate --allow-root
+
+
+wp plugin install redis-cache --activate --allow-root
+
+wp plugin update --all --allow-root
+
+
+ 
+sed -i 's/listen = \/run\/php\/php7.3-fpm.sock/listen = 9000/g' /etc/php/7.3/fpm/pool.d/www.conf
+
+mkdir /run/php
+
+
+
+wp redis enable --allow-root
+
+/usr/sbin/php-fpm7.3 -F
