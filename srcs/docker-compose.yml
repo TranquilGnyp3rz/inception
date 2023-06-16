@@ -23,8 +23,6 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - network
-    ports:
-      - 3306:3306
     restart: always
     env_file:
       - .env
@@ -46,7 +44,15 @@ services:
 
 volumes:
   mariadb_data:
+    driver_opts:
+        type: "none"
+        o: "bind"
+        device: "/home/heloufra/data/mariadb"
   wordpress_data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/heloufra/data/wordpress"
 
 networks:
   network:
