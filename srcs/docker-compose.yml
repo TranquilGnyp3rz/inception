@@ -10,7 +10,7 @@ services:
     ports:
       - 443:443
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress_data:/wordpress
     restart: always
     networks:
       - network
@@ -19,13 +19,18 @@ services:
     container_name: mariadb
     build:
       context: ./requirements/mariadb
+      args:
+        - MYSQL_DATABASE
+        - MYSQL_USER
+        - MYSQL_PASSWORD
+        - MYSQL_ROOT_PASSWORD
     volumes:
       - mariadb_data:/var/lib/mysql
+
     networks:
       - network
     restart: always
-    env_file:
-      - .env
+    init: true
 
   wordpress:
     container_name: wordpress
@@ -38,19 +43,19 @@ services:
     env_file:
       - .env
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress_data:/wordpress
     networks:
       - network
 
 volumes:
   mariadb_data:
     driver_opts:
-        type: "none"
+        type: "bind"
         o: "bind"
         device: "/home/heloufra/data/mariadb"
   wordpress_data:
     driver_opts:
-      type: "none"
+      type: "bind"
       o: "bind"
       device: "/home/heloufra/data/wordpress"
 
