@@ -1,0 +1,5 @@
+sudo apt update
+sudo apt upgrade
+sudo apt install mariadb-server -y
+service mysql start
+mysql_secure_installation
