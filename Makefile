@@ -7,6 +7,4 @@ up:
 down:
 	docker compose -f ./srcs/docker-compose.yml down
 fclean:
-	docker system prune -a ; \
-	rm -rf /home/heloufra/data/mysql/* && \
-	rm -rf /home/heloufra/data/wordpress/* \
+	docker system prune -a
