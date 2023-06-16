@@ -1,7 +1,9 @@
 #!/bin/bash
 
-sleep 20
+sleep 20 
+
 chown -R www-data *
+
 wp  config create --allow-root --dbhost="${MYSQL_HOSTNAME}" --dbname="${MYSQL_DATABASE}" --dbuser="${MYSQL_USER}" --dbpass="${MYSQL_PASSWORD}"
 
 wp core install --allow-root --url="${URL_DNS}" --title="${WP_TITLE}" --admin_name="${WP_TITLE}" --admin_password="${WP_ADMIN_PSW}" --admin_email="${WP_ADMIN_EMAIL}"
